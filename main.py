@@ -467,7 +467,7 @@ def create_vscan_interface(parent):
         except Exception as e:
             result_text.insert(tk.END, f"An error occurred during SQL injection testing: {str(e)}\n")
 
-    # Function to test for Local File Inclusion vulnerability
+    # Function to test for Remote Code Execution vulnerability
     def rce_test(url, result_text):
         response = requests.get(url, verify=False)
         if response is None:
