@@ -85,7 +85,7 @@ def signup_button():
     import signup
 
 def create_main_window():
-    import home
+    import main
 
 root = Tk()
 root.geometry('950x640+50+50')
