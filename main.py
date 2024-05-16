@@ -332,7 +332,7 @@ def create_vscan_interface(parent):
 
             result_text.insert(tk.END, "Testing LFI...\n")
             result_text.update_idletasks()
-            lfi_test(url, result_text)
+            rce_test(url, result_text)
 
             result_text.insert(tk.END, "Vulnerability scan completed for URL: " + url + "\n")
         except Exception as e:
@@ -468,24 +468,25 @@ def create_vscan_interface(parent):
             result_text.insert(tk.END, f"An error occurred during SQL injection testing: {str(e)}\n")
 
     # Function to test for Local File Inclusion vulnerability
-    def lfi_test(url, result_text):
+    def rce_test(url, result_text):
         response = requests.get(url, verify=False)
         if response is None:
             result_text.insert(tk.END, "Error: No response data received from the server.\n")
             return
 
         soup = bs4.BeautifulSoup(response.text, "html.parser")
-        potential_lfi = []
-        for link in soup.find_all('a'):
-            href = link.get('href')
-            if href and "../" in href:
-                potential_lfi.append(href)
-        if potential_lfi:
-            result_text.insert(tk.END, "Potential Local File Inclusion vulnerabilities found:\n")
-            for url in potential_lfi:
+        potential_rce = []
+        for form in soup.find_all('form'):
+            action = form.get('action')
+            if action and action.startswith("http"):
+                potential_rce.append(action)
+
+        if potential_rce:
+            result_text.insert(tk.END, "Potential Remote Code Execution vulnerabilities found:\n")
+            for url in potential_rce:
                 result_text.insert(tk.END, url + "\n")
         else:
-            result_text.insert(tk.END, "No Local File Inclusion vulnerabilities found.\n")
+            result_text.insert(tk.END, "No Remote Code Execution vulnerabilities found.\n")
 
 # Sub Domain Scanner and it's applications
 
