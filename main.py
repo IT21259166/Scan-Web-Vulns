@@ -14,6 +14,7 @@ from censys.common.exceptions import (
 import requests
 import bs4
 import threading
+import json
 
 # Home window geometry
 
@@ -493,14 +494,20 @@ def create_vscan_interface(parent):
 MAX_PER_PAGE = 100
 COMMUNITY_PAGES = 10
 
-# API ID and API secret
-CENSYS_API_ID = "777541a1-b52c-470e-9979-633d6dec4dce"
-CENSYS_API_SECRET = "mmFs280QYfgjvBEVjYJ0s3XmrbuhIIQ1"
+def load_config():
+    with open("config.json", "r") as config_file:
+        config = json.load(config_file)
+    return config
 
 def find_subdomains(domain, result_text):
     try:
+        with open('config.json') as config_file:
+            config = json.load(config_file)
+            censys_api_id = config.get('CENSYS_API_ID')
+            censys_api_secret = config.get('CENSYS_API_SECRET')
+
         censys_certificates = CensysCerts(
-            api_id=CENSYS_API_ID, api_secret=CENSYS_API_SECRET
+            api_id=censys_api_id, api_secret=censys_api_secret
         )
         certificate_query = "names: %s" % domain
         certificates_search_results = censys_certificates.search(
@@ -527,6 +534,10 @@ def find_subdomains(domain, result_text):
             result_text.insert(tk.END, "No subdomains found.")
             result_text.config(state="disabled")
 
+    except FileNotFoundError:
+        messagebox.showerror("Error", "Config file not found.")
+    except KeyError:
+        messagebox.showerror("Error", "Missing API ID or API secret in config file.")
     except CensysUnauthorizedException:
         messagebox.showerror("Error", "Your Censys credentials look invalid.")
     except CensysRateLimitExceededException:
