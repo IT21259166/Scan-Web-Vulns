@@ -331,7 +331,7 @@ def create_vscan_interface(parent):
             result_text.update_idletasks()
             sql_injection_test(url, result_text)
 
-            result_text.insert(tk.END, "Testing LFI...\n")
+            result_text.insert(tk.END, "Testing RCE...\n")
             result_text.update_idletasks()
             rce_test(url, result_text)
 
